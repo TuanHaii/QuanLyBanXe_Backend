@@ -20,5 +20,30 @@ Thư mục chính:
 - `scripts/` - scripts hỗ trợ chạy, deploy, migrate
 - `public/` - tài nguyên tĩnh nếu cần
 - `logs/` - file log ứng dụng
+## Cách chạy backend
 
+1. Tạo file `.env` ở thư mục `BE_QLBX/` nếu chưa có.
+2. Cài dependencies:
+
+```bash
+npm install
+```
+
+3. Chạy server:
+
+```bash
+npm run dev
+```
+
+4. Mở API:
+
+- `http://localhost:3000/`
+- `http://localhost:3000/api/health`
+- `http://localhost:3000/api/example`
+
+## Ghi chú
+
+- Backend hiện dùng Node.js, Express và PostgreSQL.
+- `config/db.js` kết nối PostgreSQL qua `process.env.DATABASE_URL`.
+- File `.env` không nên commit vì chứa secret.
 Bạn có thể mở rộng cấu trúc này với công nghệ cụ thể (Node.js, Python, Java, v.v.) theo nhu cầu dự án.
