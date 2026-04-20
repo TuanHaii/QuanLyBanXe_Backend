@@ -1,0 +1,19 @@
+{
+    "name": "be_qlbx",
+    "version": "1.0.0",
+    "type": "module",
+    "description": "Backend scaffold for QuanLyBanXe",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js",
+        "dev": "nodemon server.js"
+    },
+    "dependencies": {
+        "dotenv": "^16.3.1",
+        "express": "^4.18.3",
+        "pg": "^8.11.2"
+    },
+    "devDependencies": {
+        "nodemon": "^3.0.1"
+    }
+}
