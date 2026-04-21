@@ -41,6 +41,69 @@ npm run dev
 - `http://localhost:3000/api/health`
 - `http://localhost:3000/api/example`
 
+## Test backend độc lập
+
+Bạn có thể kiểm tra backend mà không cần sửa frontend bằng `curl`, Postman, Insomnia hoặc HTTP client khác.
+
+Ví dụ:
+
+```bash
+curl http://localhost:3000/api/health
+```
+
+Đăng ký user:
+
+```bash
+curl -X POST http://localhost:3000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Test User","email":"test@example.com","password":"Password123!","phone":"0987654321"}'
+```
+
+Đăng nhập:
+
+```bash
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"Password123!"}'
+```
+
+Sử dụng token để gọi endpoint bảo mật:
+
+```bash
+curl -H "Authorization: Bearer <TOKEN>" http://localhost:3000/api/auth/profile
+```
+
+> Lưu ý: `POST /api/auth/forgot-password` hiện trả về `resetToken` trong response để test nhanh. Trong thực tế bạn có thể gửi token này vào email.
+
+## Endpoint hiện tại
+
+Backend hiện hỗ trợ các API cho các giao diện sau:
+
+- Authentication / User profile:
+  - `POST /api/auth/register`
+  - `POST /api/auth/login`
+  - `POST /api/auth/logout`
+  - `GET /api/auth/profile`
+  - `PUT /api/auth/profile`
+  - `POST /api/auth/forgot-password`
+  - `POST /api/auth/reset-password`
+- Car management:
+  - `GET /api/cars`
+  - `GET /api/cars/:id`
+  - `POST /api/cars`
+  - `PUT /api/cars/:id`
+  - `DELETE /api/cars/:id`
+- Mall / Product discovery:
+  - `GET /api/mall?category=Sedan&query=toyota`
+- Sales:
+  - `GET /api/sales`
+  - `GET /api/sales/:id`
+  - `POST /api/sales`
+  - `PUT /api/sales/:id`
+  - `DELETE /api/sales/:id`
+
+Backend hiện phù hợp với giao diện đăng nhập, đăng ký, profile, reset password, quản lý xe, Mall và Sales trong app Flutter.
+
 ## Ghi chú
 
 - Backend hiện dùng Node.js, Express và PostgreSQL.

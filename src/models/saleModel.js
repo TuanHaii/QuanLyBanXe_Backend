@@ -1,0 +1,17 @@
+export const mapSale = (row) => ({
+    id: row.id,
+    carName: row.car_name,
+    carId: row.car_id,
+    customerName: row.customer_name,
+    customerId: row.customer_id,
+    customerPhone: row.customer_phone,
+    customerEmail: row.customer_email,
+    salePrice: Number(row.sale_price),
+    discount: row.discount !== null ? Number(row.discount) : null,
+    deposit: row.deposit !== null ? Number(row.deposit) : null,
+    saleDate: row.sale_date,
+    notes: row.notes,
+    status: row.status,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+})

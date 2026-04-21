@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import express from 'express'
 import logger from './config/logger.js'
-import { connectDB } from './config/db.js'
+import { connectDB, initializeDatabase } from './config/db.js'
 import apiRouter from './src/routes/index.js'
 import { errorHandler } from './src/middlewares/errorHandler.js'
 
@@ -22,11 +22,13 @@ const startServer = async () => {
         process.exit(1)
     }
 
+    await initializeDatabase()
+
+    app.use(errorHandler)
+
     app.listen(port, () => {
         logger.info(`Server is listening on port ${port}`)
     })
 }
-
-app.use(errorHandler)
 
 startServer()
