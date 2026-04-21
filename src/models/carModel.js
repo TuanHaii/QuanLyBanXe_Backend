@@ -1,0 +1,18 @@
+export const mapCar = (row) => ({
+    id: row.id,
+    brand: row.brand,
+    model: row.model,
+    category: row.category,
+    year: row.year,
+    price: row.price !== null ? Number(row.price) : null,
+    status: row.status,
+    stock: row.stock !== null ? Number(row.stock) : 0,
+    rating: row.rating !== null ? Number(row.rating) : 0,
+    imageUrl: row.image_url,
+    badgeLabel: row.badge_label,
+    badgeColor: row.badge_color,
+    description: row.description,
+    createdBy: row.created_by,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+})
