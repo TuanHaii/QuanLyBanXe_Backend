@@ -2,10 +2,6 @@
 
 Cấu trúc backend được tạo theo dạng chung để phục vụ phát triển API cho dự án `QuanLyBanXe`.
 
-## Tai lieu API cho mobile
-
-- Xem tai: `docs/mobile-api-endpoints.md`
-
 Thư mục chính:
 
 - `src/`
@@ -30,87 +26,58 @@ Thư mục chính:
 2. Cài dependencies:
 
 ```bash
+cd BE_QLBX
 npm install
-```
-
-3. Chạy server:
-
-```bash
 npm run dev
 ```
 
-4. Mở API:
+## File `.env` mẫu
 
-- `http://localhost:3000/`
-- `http://localhost:3000/api/health`
-- `http://localhost:3000/api/example`
+Tạo file `.env` tại thư mục `BE_QLBX/` nếu chưa có:
 
-## Test backend độc lập
-
-Bạn có thể kiểm tra backend mà không cần sửa frontend bằng `curl`, Postman, Insomnia hoặc HTTP client khác.
-
-Ví dụ:
-
-```bash
-curl http://localhost:3000/api/health
+```env
+APP_PORT=3000
+DATABASE_URL=postgres://user:password@localhost:5432/your_db_name
+NODE_ENV=development
 ```
 
-Đăng ký user:
+> Nếu bạn chỉ cần chạy backend mock để phát triển FE, backend hiện đã được điều chỉnh để khởi động ngay cả khi không thể kết nối PostgreSQL.
 
-```bash
-curl -X POST http://localhost:3000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Test User","email":"test@example.com","password":"Password123!","phone":"0987654321"}'
+## Endpoint quan trọng cho FE
+
+- `POST /api/auth/login`
+- `POST /api/auth/register`
+- `PUT /api/auth/profile`
+- `GET /api/mall`
+- `GET /api/sales`
+- `GET /api/sales/{id}`
+
+## Dữ liệu trả về
+
+Backend trả về JSON chuẩn:
+
+```json
+{
+  "success": true,
+  "message": "...",
+  "data": { ... }
+}
 ```
 
-Đăng nhập:
+Đối với auth login/register và update profile, backend cũng trả thêm:
 
-```bash
-curl -X POST http://localhost:3000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"Password123!"}'
+```json
+{
+  "success": true,
+  "message": "...",
+  "token": "...",
+  "user": { ... },
+  "data": { ... }
+}
 ```
 
-Sử dụng token để gọi endpoint bảo mật:
+## Ghi chú quan trọng
 
-```bash
-curl -H "Authorization: Bearer <TOKEN>" http://localhost:3000/api/auth/profile
-```
-
-> Lưu ý: `POST /api/auth/forgot-password` hiện trả về `resetToken` trong response để test nhanh. Trong thực tế bạn có thể gửi token này vào email.
-
-## Endpoint hiện tại
-
-Backend hiện hỗ trợ các API cho các giao diện sau:
-
-- Authentication / User profile:
-  - `POST /api/auth/register`
-  - `POST /api/auth/login`
-  - `POST /api/auth/logout`
-  - `GET /api/auth/profile`
-  - `PUT /api/auth/profile`
-  - `POST /api/auth/forgot-password`
-  - `POST /api/auth/reset-password`
-- Car management:
-  - `GET /api/cars`
-  - `GET /api/cars/:id`
-  - `POST /api/cars`
-  - `PUT /api/cars/:id`
-  - `DELETE /api/cars/:id`
-- Mall / Product discovery:
-  - `GET /api/mall?category=Sedan&query=toyota`
-- Sales:
-  - `GET /api/sales`
-  - `GET /api/sales/:id`
-  - `POST /api/sales`
-  - `PUT /api/sales/:id`
-  - `DELETE /api/sales/:id`
-
-Backend hiện phù hợp với giao diện đăng nhập, đăng ký, profile, reset password, quản lý xe, Mall và Sales trong app Flutter.
-
-## Ghi chú
-
-- Backend hiện dùng Node.js, Express và PostgreSQL.
-- `config/db.js` kết nối PostgreSQL qua `process.env.DATABASE_URL`.
-- File `.env` không nên commit vì chứa secret.
-Bạn có thể mở rộng cấu trúc này với công nghệ cụ thể (Node.js, Python, Java, v.v.) theo nhu cầu dự án.
+- `config/db.js` cấu hình kết nối PostgreSQL.
+- Frontend FE đang dùng API local nên cần đảm bảo backend khởi động trước khi chạy app.
+- Nếu FE chạy trên Android emulator, dùng `10.0.2.2` để ánh xạ tới máy chủ địa phương.

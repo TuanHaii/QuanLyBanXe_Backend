@@ -1,0 +1,21 @@
+{
+    "id": "0c845911-541a-4e5d-b067-3b6adb9b1234",
+    "name": "BE_QLBX Local",
+    "values": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:3000/api",
+            "enabled": true
+        },
+        {
+            "key": "authToken",
+            "value": "mock-token-admin",
+            "enabled": true
+        }
+    ],
+    "timestamp": 1700000000000,
+    "synced": false,
+    "_postman_variable_scope": "environment",
+    "_postman_exported_at": "2026-04-22T00:00:00.000Z",
+    "_postman_exported_using": "Postman/10.0"
+}

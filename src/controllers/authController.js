@@ -1,72 +1,166 @@
 import {
-    registerUser,
+    buildUserResponse,
+    getUserByToken,
     loginUser,
-    logoutUser,
-    forgotPassword,
-    resetPassword,
-    getUserProfile,
-    updateUserProfile,
+    registerUser,
+    updateProfile,
+    updateSettings,
 } from '../services/authService.js'
-import { successResponse } from '../utils/apiResponse.js'
+import { errorResponse, successResponse } from '../utils/apiResponse.js'
 
-export const register = async (req, res, next) => {
+export const login = (req, res, next) => {
     try {
-        const payload = await registerUser(req.body)
-        return successResponse(res, payload, 'User registered successfully')
+        const { email, password } = req.body
+        if (!email || !password) {
+            return errorResponse(res, 400, 'Email và mật khẩu là bắt buộc')
+        }
+
+        const user = loginUser({ email, password })
+        if (!user) {
+            return errorResponse(res, 401, 'Email hoặc mật khẩu không đúng')
+        }
+
+        const payload = buildUserResponse(user)
+        return res.status(200).json({
+            success: true,
+            message: 'Đăng nhập thành công',
+            token: user.token,
+            user: payload,
+            data: payload,
+        })
     } catch (error) {
         next(error)
     }
 }
 
-export const login = async (req, res, next) => {
+export const register = (req, res, next) => {
     try {
-        const payload = await loginUser(req.body)
-        return successResponse(res, payload, 'Login successful')
+        const { name, email, password, phone } = req.body
+        if (!name || !email || !password || !phone) {
+            return errorResponse(res, 400, 'Name, email, password và phone là bắt buộc')
+        }
+
+        const user = registerUser({ name, email, password, phone })
+        if (!user) {
+            return errorResponse(res, 409, 'Email đã được sử dụng')
+        }
+
+        const payload = buildUserResponse(user)
+        return res.status(200).json({
+            success: true,
+            message: 'Đăng ký thành công',
+            token: user.token,
+            user: payload,
+            data: payload,
+        })
     } catch (error) {
         next(error)
     }
 }
 
-export const logout = async (req, res, next) => {
+export const logout = (req, res, next) => {
     try {
-        const payload = await logoutUser()
-        return successResponse(res, payload, 'Logout successful')
+        return successResponse(res, null, 'Đăng xuất thành công')
     } catch (error) {
         next(error)
     }
 }
 
-export const requestPasswordReset = async (req, res, next) => {
+export const forgotPassword = (req, res, next) => {
     try {
-        const payload = await forgotPassword(req.body.email)
-        return successResponse(res, payload, 'If the email is registered, reset instructions were sent')
+        const { email } = req.body
+        if (!email) {
+            return errorResponse(res, 400, 'Email là bắt buộc')
+        }
+        return successResponse(res, null, 'Yêu cầu đặt lại mật khẩu đã được gửi')
     } catch (error) {
         next(error)
     }
 }
 
-export const resetPasswordHandler = async (req, res, next) => {
+export const resetPassword = (req, res, next) => {
     try {
-        const payload = await resetPassword(req.body)
-        return successResponse(res, payload, 'Password reset successful')
+        const { token, password } = req.body
+        if (!token || !password) {
+            return errorResponse(res, 400, 'Token và mật khẩu mới là bắt buộc')
+        }
+        return successResponse(res, null, 'Mật khẩu đã được cập nhật')
     } catch (error) {
         next(error)
     }
 }
 
-export const getProfile = async (req, res, next) => {
+export const getProfile = (req, res, next) => {
     try {
-        const payload = await getUserProfile(req.user.id)
-        return successResponse(res, payload, 'User profile loaded')
+        const authToken = req.headers.authorization?.replace('Bearer ', '') || ''
+        const user = getUserByToken(authToken)
+        if (!user) {
+            return errorResponse(res, 401, 'Token không hợp lệ')
+        }
+        const payload = buildUserResponse(user)
+        return res.status(200).json({
+            success: true,
+            message: 'Thông tin người dùng',
+            ...payload,
+            data: payload,
+        })
     } catch (error) {
         next(error)
     }
 }
 
-export const updateProfile = async (req, res, next) => {
+export const updateProfileController = (req, res, next) => {
     try {
-        const payload = await updateUserProfile(req.user.id, req.body)
-        return successResponse(res, payload, 'Profile updated successfully')
+        const authToken = req.headers.authorization?.replace('Bearer ', '') || ''
+        const user = getUserByToken(authToken)
+        if (!user) {
+            return errorResponse(res, 401, 'Token không hợp lệ')
+        }
+        const updated = updateProfile(user, req.body)
+        const payload = buildUserResponse(updated)
+        return res.status(200).json({
+            success: true,
+            message: 'Cập nhật hồ sơ thành công',
+            ...payload,
+            data: payload,
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const getSettings = (req, res, next) => {
+    try {
+        const authToken = req.headers.authorization?.replace('Bearer ', '') || ''
+        const user = getUserByToken(authToken)
+        if (!user) {
+            return errorResponse(res, 401, 'Token không hợp lệ')
+        }
+        return res.status(200).json({
+            success: true,
+            message: 'Cài đặt người dùng',
+            preferences: user.preferences,
+            data: { preferences: user.preferences },
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const updateSettingsController = (req, res, next) => {
+    try {
+        const authToken = req.headers.authorization?.replace('Bearer ', '') || ''
+        const user = getUserByToken(authToken)
+        if (!user) {
+            return errorResponse(res, 401, 'Token không hợp lệ')
+        }
+        const updated = updateSettings(user, req.body)
+        return res.status(200).json({
+            success: true,
+            message: 'Cập nhật cài đặt thành công',
+            preferences: updated.preferences,
+            data: { preferences: updated.preferences },
+        })
     } catch (error) {
         next(error)
     }
