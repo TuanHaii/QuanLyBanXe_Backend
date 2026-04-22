@@ -1,0 +1,987 @@
+openapi: 3.0.3
+info:
+  title: BE_QLBX API
+  version: 1.0.0
+  description: Backend API schema for FE integration with QuanLyBanXe.
+servers:
+  - url: http://localhost:3000
+    description: Local backend server
+paths:
+  /:
+    get:
+      summary: Root health check
+      responses:
+        '200':
+          description: Service status
+  /api/health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: Service healthy
+  /api/auth/login:
+    post:
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+  /api/auth/register:
+    post:
+      summary: Register user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '200':
+          description: Register successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+  /api/auth/profile:
+    get:
+      summary: Get authenticated profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+    put:
+      summary: Update profile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+      responses:
+        '200':
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+  /api/auth/settings:
+    get:
+      summary: Get user settings
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Settings retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettingsResponse'
+    put:
+      summary: Update user settings
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSettingsRequest'
+      responses:
+        '200':
+          description: Settings updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettingsResponse'
+  /api/cars:
+    get:
+      summary: List cars
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Car list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Car'
+    post:
+      summary: Create car
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCarRequest'
+      responses:
+        '200':
+          description: Car created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Car'
+  /api/cars/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get car details
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Car details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Car'
+    put:
+      summary: Update car
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCarRequest'
+      responses:
+        '200':
+          description: Car updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Car'
+    delete:
+      summary: Delete car
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Car deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StandardResponse'
+  /api/mall:
+    get:
+      summary: List mall products
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: query
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Product list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MallProduct'
+  /api/sales:
+    get:
+      summary: List sales
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum:
+              - pending
+              - completed
+              - cancelled
+        - name: query
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Sales list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Sale'
+  /api/sales/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get sale details
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Sale details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Sale'
+  /api/notifications:
+    get:
+      summary: List notifications
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: is_read
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Notification list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Notification'
+  /api/notifications/count:
+    get:
+      summary: Notification count
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: is_read
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Notification count
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+  /api/notifications/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Notification detail
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Notification detail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Notification'
+  /api/notifications/{id}/read:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    put:
+      summary: Mark notification as read
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Notification updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Notification'
+  /api/history:
+    get:
+      summary: List history records
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: History records
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/HistoryRecord'
+  /api/dashboard/summary:
+    get:
+      summary: Dashboard summary
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Dashboard data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+  /api/reports:
+    get:
+      summary: Report summary
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Report data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+  /api/reports/goals:
+    get:
+      summary: Report goals
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Report goals data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+  /api/support:
+    get:
+      summary: Support topics
+      responses:
+        '200':
+          description: Support categories
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        title:
+                          type: string
+                        description:
+                          type: string
+  /api/support/contact:
+    post:
+      summary: Submit support request
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactSupportRequest'
+      responses:
+        '200':
+          description: Contact submitted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+  /api/support/requests:
+    get:
+      summary: User support requests
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Support request list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+  /api/support/requests/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Support request detail
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Support request detail
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+  components:
+    securitySchemes:
+      bearerAuth:
+        type: http
+        scheme: bearer
+        bearerFormat: JWT
+    schemas:
+      LoginRequest:
+        type: object
+        required:
+          - email
+          - password
+        properties:
+          email:
+            type: string
+            format: email
+          password:
+            type: string
+            minLength: 6
+      RegisterRequest:
+        type: object
+        required:
+          - name
+          - email
+          - password
+          - phone
+        properties:
+          name:
+            type: string
+          email:
+            type: string
+            format: email
+          password:
+            type: string
+            minLength: 6
+          phone:
+            type: string
+      UpdateProfileRequest:
+        type: object
+        properties:
+          name:
+            type: string
+          phone:
+            type: string
+          avatar:
+            type: string
+      UpdateSettingsRequest:
+        type: object
+        properties:
+          dark_mode:
+            type: boolean
+          follow_system:
+            type: boolean
+      AuthResponse:
+        type: object
+        properties:
+          success:
+            type: boolean
+          message:
+            type: string
+          token:
+            type: string
+          user:
+            $ref: '#/components/schemas/User'
+          data:
+            $ref: '#/components/schemas/User'
+      UserResponse:
+        type: object
+        properties:
+          success:
+            type: boolean
+          message:
+            type: string
+          data:
+            $ref: '#/components/schemas/User'
+      SettingsResponse:
+        type: object
+        properties:
+          success:
+            type: boolean
+          message:
+            type: string
+          preferences:
+            type: object
+            properties:
+              dark_mode:
+                type: boolean
+              follow_system:
+                type: boolean
+          data:
+            type: object
+            properties:
+              preferences:
+                type: object
+                properties:
+                  dark_mode:
+                    type: boolean
+                  follow_system:
+                    type: boolean
+      StandardResponse:
+        type: object
+        properties:
+          success:
+            type: boolean
+          message:
+            type: string
+          data:
+            nullable: true
+            type: object
+      Car:
+        type: object
+        properties:
+          id:
+            type: string
+          name:
+            type: string
+          brand:
+            type: string
+          model:
+            type: string
+          year:
+            type: integer
+          color:
+            type: string
+          price:
+            type: number
+          mileage:
+            type: number
+            nullable: true
+          description:
+            type: string
+            nullable: true
+          fuel_type:
+            type: string
+            nullable: true
+          transmission:
+            type: string
+            nullable: true
+          status:
+            type: string
+            enum:
+              - available
+              - sold
+              - reserved
+          images:
+            type: array
+            items:
+              type: string
+          created_at:
+            type: string
+            format: date-time
+          updated_at:
+            type: string
+            format: date-time
+      CreateCarRequest:
+        type: object
+        required:
+          - name
+          - brand
+          - model
+          - year
+          - color
+          - price
+        properties:
+          name:
+            type: string
+          brand:
+            type: string
+          model:
+            type: string
+          year:
+            type: integer
+            minimum: 1900
+            maximum: 2100
+          color:
+            type: string
+          price:
+            type: number
+            minimum: 0
+          mileage:
+            type: number
+            minimum: 0
+          description:
+            type: string
+          fuel_type:
+            type: string
+          transmission:
+            type: string
+          status:
+            type: string
+            enum:
+              - available
+              - sold
+              - reserved
+          images:
+            type: array
+            items:
+              type: string
+      UpdateCarRequest:
+        type: object
+        properties:
+          name:
+            type: string
+          brand:
+            type: string
+          model:
+            type: string
+          year:
+            type: integer
+            minimum: 1900
+            maximum: 2100
+          color:
+            type: string
+          price:
+            type: number
+            minimum: 0
+          mileage:
+            type: number
+            minimum: 0
+          description:
+            type: string
+          fuel_type:
+            type: string
+          transmission:
+            type: string
+          status:
+            type: string
+            enum:
+              - available
+              - sold
+              - reserved
+          images:
+            type: array
+            items:
+              type: string
+      MallProduct:
+        type: object
+        properties:
+          id:
+            type: string
+          brand:
+            type: string
+          model:
+            type: string
+          name:
+            type: string
+          category:
+            type: string
+          year:
+            type: integer
+          price:
+            type: number
+          stock:
+            type: integer
+          rating:
+            type: number
+          status:
+            type: string
+          image_url:
+            type: string
+          badge_label:
+            type: string
+          badge_color:
+            type: string
+          description:
+            type: string
+            nullable: true
+          created_at:
+            type: string
+            format: date-time
+          updated_at:
+            type: string
+            format: date-time
+      Sale:
+        type: object
+        properties:
+          id:
+            type: string
+          car_name:
+            type: string
+          car_id:
+            type: string
+            nullable: true
+          customer_name:
+            type: string
+          customer_id:
+            type: string
+            nullable: true
+          customer_phone:
+            type: string
+            nullable: true
+          customer_email:
+            type: string
+            nullable: true
+          sale_price:
+            type: number
+          discount:
+            type: number
+            nullable: true
+          deposit:
+            type: number
+            nullable: true
+          sale_date:
+            type: string
+            format: date-time
+          notes:
+            type: string
+            nullable: true
+          status:
+            type: string
+          created_at:
+            type: string
+            format: date-time
+          updated_at:
+            type: string
+            format: date-time
+      Notification:
+        type: object
+        properties:
+          id:
+            type: string
+          category:
+            type: string
+          title:
+            type: string
+          message:
+            type: string
+          icon:
+            type: string
+          is_read:
+            type: boolean
+          created_at:
+            type: string
+            format: date-time
+      HistoryRecord:
+        type: object
+        properties:
+          id:
+            type: string
+          action:
+            type: string
+          timestamp:
+            type: string
+            format: date-time
+      ContactSupportRequest:
+        type: object
+        required:
+          - name
+          - email
+          - message
+        properties:
+          name:
+            type: string
+          email:
+            type: string
+            format: email
+          message:
+            type: string
+      User:
+        type: object
+        properties:
+          id:
+            type: string
+          name:
+            type: string
+          email:
+            type: string
+            format: email
+          phone:
+            type: string
+          role:
+            type: string
+          avatar:
+            type: string
+            nullable: true
+          token:
+            type: string
+          preferences:
+            type: object
+            properties:
+              dark_mode:
+                type: boolean
+              follow_system:
+                type: boolean
+          created_at:
+            type: string
+            format: date-time
+          updated_at:
+            type: string
+            format: date-time

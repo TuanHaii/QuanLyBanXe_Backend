@@ -1,52 +1,60 @@
 import {
-    getAllCars,
-    getCarById,
     createCar,
-    updateCar,
     deleteCar,
+    getCarById,
+    getCars,
+    updateCar,
 } from '../services/carService.js'
-import { successResponse } from '../utils/apiResponse.js'
+import { errorResponse, successResponse } from '../utils/apiResponse.js'
 
-export const listCars = async (req, res, next) => {
+export const listCars = (req, res, next) => {
     try {
-        const cars = await getAllCars()
-        return successResponse(res, cars, 'Cars loaded successfully')
+        return successResponse(res, getCars(), 'Danh sách xe')
     } catch (error) {
         next(error)
     }
 }
 
-export const getCar = async (req, res, next) => {
+export const getCarDetail = (req, res, next) => {
     try {
-        const car = await getCarById(req.params.id)
-        return successResponse(res, car, 'Car details loaded')
+        const car = getCarById(req.params.id)
+        if (!car) {
+            return errorResponse(res, 404, 'Xe không tồn tại')
+        }
+        return successResponse(res, car, 'Chi tiết xe')
     } catch (error) {
         next(error)
     }
 }
 
-export const createCarHandler = async (req, res, next) => {
+export const createCarController = (req, res, next) => {
     try {
-        const car = await createCar(req.body, req.user.id)
-        return successResponse(res, car, 'Car created successfully')
+        const car = createCar(req.body)
+        return successResponse(res, car, 'Xe đã được thêm')
     } catch (error) {
         next(error)
     }
 }
 
-export const updateCarHandler = async (req, res, next) => {
+export const updateCarController = (req, res, next) => {
     try {
-        const car = await updateCar(req.params.id, req.body)
-        return successResponse(res, car, 'Car updated successfully')
+        const updatedCar = updateCar(req.params.id, req.body)
+        if (!updatedCar) {
+            return errorResponse(res, 404, 'Xe không tồn tại')
+        }
+        return successResponse(res, updatedCar, 'Xe đã được cập nhật')
     } catch (error) {
         next(error)
     }
 }
 
-export const deleteCarHandler = async (req, res, next) => {
+export const deleteCarController = (req, res, next) => {
     try {
-        const payload = await deleteCar(req.params.id)
-        return successResponse(res, payload, 'Car deleted successfully')
+        const deleted = deleteCar(req.params.id)
+        if (!deleted) {
+            return errorResponse(res, 404, 'Xe không tồn tại')
+        }
+        return successResponse(res, null, 'Xe đã được xóa')
     } catch (error) {
         next(error)
     }

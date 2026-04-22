@@ -1,19 +1,21 @@
 import express from 'express'
 import {
+    createCarController,
+    deleteCarController,
+    getCarDetail,
     listCars,
-    getCar,
-    createCarHandler,
-    updateCarHandler,
-    deleteCarHandler,
+    updateCarController,
 } from '../controllers/carController.js'
-import { authenticate } from '../middlewares/authMiddleware.js'
+import { requireAuth } from '../middlewares/authMiddleware.js'
+import { validateBody } from '../validators/requestValidator.js'
+import { carSchemas } from '../schemas/index.js'
 
 const router = express.Router()
 
-router.get('/', listCars)
-router.get('/:id', getCar)
-router.post('/', authenticate, createCarHandler)
-router.put('/:id', authenticate, updateCarHandler)
-router.delete('/:id', authenticate, deleteCarHandler)
+router.get('/', requireAuth, listCars)
+router.get('/:id', requireAuth, getCarDetail)
+router.post('/', requireAuth, validateBody(carSchemas.createCar), createCarController)
+router.put('/:id', requireAuth, validateBody(carSchemas.updateCar), updateCarController)
+router.delete('/:id', requireAuth, deleteCarController)
 
 export default router

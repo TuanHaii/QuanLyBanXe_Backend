@@ -1,0 +1,253 @@
+BE_QLBX API Documentation
+
+Tài liệu này mô tả chi tiết các endpoint backend hiện có trong BE_QLBX để FE QuanLyBanXe có thể gọi.
+
+1. Tổng quan
+
+- Base URL:
+  - Local: http://localhost:3000/api
+  - Android emulator: http://10.0.2.2:3000/api
+- Auth header:
+  - Authorization: Bearer <token>
+- Response chung:
+
+{
+  "success": true,
+  "message": "...",
+  "data": { ... }
+}
+
+- Auth login/register/update profile trả thêm:
+
+{
+  "success": true,
+  "message": "...",
+  "token": "...",
+  "user": { ... },
+  "data": { ... }
+}
+
+- Mock user hiện có:
+  - Email: admin@mock.com
+  - Password: 123456
+  - Token: mock-token-admin
+
+2. Authentication / User
+
+2.1 POST /api/auth/login
+
+Request body:
+{
+  "email": "admin@mock.com",
+  "password": "123456"
+}
+
+Response:
+{
+  "success": true,
+  "message": "Đăng nhập thành công",
+  "token": "mock-token-admin",
+  "user": { ... },
+  "data": { ... }
+}
+
+2.2 POST /api/auth/register
+
+Request body:
+{
+  "name": "Nguyễn Văn A",
+  "email": "user@example.com",
+  "password": "123456",
+  "phone": "0901234567"
+}
+
+Response: cấu trúc tương tự login.
+
+2.3 POST /api/auth/logout
+
+Auth: yes
+Body: none
+
+Response:
+{
+  "success": true,
+  "message": "Đăng xuất thành công",
+  "data": null
+}
+
+2.4 POST /api/auth/forgot-password
+
+Request body:
+{
+  "email": "user@example.com"
+}
+
+Response:
+{
+  "success": true,
+  "message": "Yêu cầu đặt lại mật khẩu đã được gửi",
+  "data": null
+}
+
+2.5 POST /api/auth/reset-password
+
+Request body:
+{
+  "token": "abc123",
+  "password": "newpassword"
+}
+
+Response:
+{
+  "success": true,
+  "message": "Mật khẩu đã được cập nhật",
+  "data": null
+}
+
+2.6 GET /api/auth/me
+
+Auth: yes
+Response: thông tin user hiện tại.
+
+2.7 GET /api/auth/profile
+
+Auth: yes
+Response: thông tin profile.
+
+2.8 PUT /api/auth/profile
+
+Request body:
+{
+  "name": "Nguyễn Văn A",
+  "phone": "0901234567",
+  "avatar": "https://..."
+}
+
+Response: dữ liệu user đã cập nhật.
+
+2.9 GET /api/auth/settings
+
+Auth: yes
+Response: cài đặt người dùng.
+
+2.10 PUT /api/auth/settings
+
+Request body:
+{
+  "dark_mode": false,
+  "follow_system": true
+}
+
+Response: cài đặt mới.
+
+3. Cars
+
+3.1 GET /api/cars
+
+Auth: yes
+Response: danh sách xe.
+
+3.2 GET /api/cars/{id}
+
+Auth: yes
+Response: chi tiết xe.
+
+3.3 POST /api/cars
+
+Request body: thông tin xe.
+
+3.4 PUT /api/cars/{id}
+
+Request body: dữ liệu cần cập nhật.
+
+3.5 DELETE /api/cars/{id}
+
+Auth: yes
+Response: xác nhận xóa.
+
+4. Mall
+
+4.1 GET /api/mall
+
+Auth: yes
+Query params: category, query.
+
+5. Sales
+
+5.1 GET /api/sales
+
+Auth: yes
+Query params: status, query.
+
+5.2 GET /api/sales/{id}
+
+Auth: yes
+
+6. Notifications
+
+6.1 GET /api/notifications
+
+Auth: yes
+Query params: category, is_read.
+
+6.2 GET /api/notifications/count
+
+Auth: yes
+Query params: is_read.
+
+6.3 GET /api/notifications/{id}
+
+Auth: yes
+
+6.4 PUT /api/notifications/{id}/read
+
+Auth: yes
+
+7. History
+
+7.1 GET /api/history
+
+Auth: yes
+Query params: query.
+
+8. Dashboard
+
+8.1 GET /api/dashboard/summary
+
+Auth: yes
+
+9. Reports
+
+9.1 GET /api/reports
+
+Auth: yes
+
+9.2 GET /api/reports/goals
+
+Auth: yes
+
+10. Support
+
+10.1 GET /api/support
+
+Auth: no
+
+10.2 POST /api/support/contact
+
+Auth: yes
+Body: name, email, message.
+
+10.3 GET /api/support/requests
+
+Auth: yes
+Query params: status.
+
+10.4 GET /api/support/requests/{id}
+
+Auth: yes
+
+11. Notes
+
+- Backend vẫn khởi động khi PostgreSQL không kết nối.
+- FE phải gửi Authorization header cho endpoint auth.
+- Android emulator dùng 10.0.2.2.
