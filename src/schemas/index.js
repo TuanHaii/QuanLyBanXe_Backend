@@ -1,5 +1,6 @@
 export { authSchemas } from './authSchemas.js'
 export { carSchemas } from './carSchemas.js'
+export { catalogSchemas } from './catalogSchemas.js'
 export { saleSchemas } from './saleSchemas.js'
 export { mallSchemas } from './mallSchemas.js'
 export { notificationSchemas } from './notificationSchemas.js'

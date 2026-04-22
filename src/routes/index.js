@@ -10,6 +10,7 @@ import reportRoutes from './reportRoutes.js'
 import supportRoutes from './supportRoutes.js'
 import salesRoutes from './salesRoutes.js'
 import healthRoutes from './healthRoutes.js'
+import catalogRoutes from './catalogRoutes.js'
 
 const router = express.Router()
 
@@ -24,5 +25,6 @@ router.use('/support', supportRoutes)
 router.use('/history', historyRoutes)
 router.use('/sales', salesRoutes)
 router.use('/cars', carRoutes)
+router.use('/catalog', catalogRoutes)
 
 export default router
