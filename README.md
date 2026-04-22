@@ -2,6 +2,10 @@
 
 Cấu trúc backend được tạo theo dạng chung để phục vụ phát triển API cho dự án `QuanLyBanXe`.
 
+## Tai lieu API cho mobile
+
+- Xem tai: `docs/mobile-api-endpoints.md`
+
 Thư mục chính:
 
 - `src/`
