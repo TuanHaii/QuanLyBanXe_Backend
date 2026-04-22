@@ -18,8 +18,7 @@ app.get('/', (req, res) => {
 const startServer = async () => {
     const db = await connectDB()
     if (!db) {
-        logger.error('Unable to start server because database connection failed.')
-        process.exit(1)
+        logger.warn('Database connection failed. Starting server with mock data only.')
     }
 
     app.listen(port, () => {
