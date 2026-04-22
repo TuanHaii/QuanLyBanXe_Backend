@@ -27,4 +27,7 @@ export const carSchemas = {
         status: { type: 'string', required: false, enum: ['available', 'sold', 'reserved'] },
         images: { type: 'array', required: false, itemsType: 'string' },
     },
+    getCarById: {
+        id: { type: 'string', required: true },
+    },
 }
