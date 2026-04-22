@@ -1,18 +1,20 @@
-import { dashboardSummary, dashboardTransactions } from './dataStore.js'
+import { getDashboardSummary } from './dashboardService.js'
 
-export const getReportSummary = () => {
+export const getReportSummary = async () => {
+    const dashboard = await getDashboardSummary()
+
     return {
-        summary: dashboardSummary,
+        summary: dashboard.summary,
         goals: {
             revenue_target: '5.0M',
             achieved_rate: '84%',
             progress_text: 'Hoàn thành 84% mục tiêu tháng',
         },
-        recent_transactions: dashboardTransactions,
+        recent_transactions: dashboard.recent_transactions,
     }
 }
 
-export const getReportGoals = () => {
+export const getReportGoals = async () => {
     return {
         revenue_target: '5.0M',
         achieved_rate: '84%',

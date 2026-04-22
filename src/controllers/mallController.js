@@ -1,9 +1,9 @@
 import { getMallProducts } from '../services/mallService.js'
 import { successResponse } from '../utils/apiResponse.js'
 
-export const listMallProducts = (req, res, next) => {
+export const listMallProducts = async (req, res, next) => {
     try {
-        const products = getMallProducts({
+        const products = await getMallProducts({
             category: req.query.category,
             query: req.query.query,
         })

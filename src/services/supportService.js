@@ -1,4 +1,4 @@
-const contactRequests = []
+import prisma from './prismaClient.js'
 
 export const getSupportItems = () => {
     return [
@@ -23,34 +23,75 @@ export const getSupportItems = () => {
     ]
 }
 
-export const submitSupportContact = ({ name, email, message }) => {
-    const request = {
-        id: `contact-${Date.now()}`,
+export const submitSupportContact = async ({ maTaiKhoan, name, email, message }) => {
+    const request = await prisma.nhatKyHoatDong.create({
+        data: {
+            maTaiKhoan,
+            hanhDong: 'support_contact',
+            tieuDe: name,
+            noiDung: message,
+            danhMuc: email,
+            icon: 'support',
+            daDoc: false,
+        },
+    })
+
+    return {
+        id: String(request.maLog),
         name,
         email,
         message,
         status: 'pending',
-        created_at: new Date().toISOString(),
+        created_at: request.thoiGian.toISOString(),
     }
-    contactRequests.push(request)
-    return request
 }
 
-export const getSupportContacts = ({ email, status } = {}) => {
-    let results = [...contactRequests]
-    if (email) {
-        results = results.filter(
-            (request) => request.email.toLowerCase() === email.toLowerCase(),
-        )
-    }
-    if (status) {
-        results = results.filter(
-            (request) => request.status === status,
-        )
-    }
-    return results
+export const getSupportContacts = async ({ maTaiKhoan, email, status } = {}) => {
+    const requests = await prisma.nhatKyHoatDong.findMany({
+        where: {
+            ...(maTaiKhoan ? { maTaiKhoan } : {}),
+            hanhDong: 'support_contact',
+        },
+        orderBy: { thoiGian: 'desc' },
+    })
+
+    return requests
+        .map((request) => ({
+            id: String(request.maLog),
+            name: request.tieuDe ?? '',
+            email: request.danhMuc ?? email ?? '',
+            message: request.noiDung ?? '',
+            status: request.daDoc ? 'resolved' : 'pending',
+            created_at: request.thoiGian.toISOString(),
+        }))
+        .filter((request) => {
+            if (email && request.email.toLowerCase() !== email.toLowerCase()) {
+                return false
+            }
+
+            if (status && request.status !== status) {
+                return false
+            }
+
+            return true
+        })
 }
 
-export const getSupportRequestById = (id) => {
-    return contactRequests.find((request) => request.id === id)
+export const getSupportRequestById = async (id) => {
+    const request = await prisma.nhatKyHoatDong.findUnique({
+        where: { maLog: Number(id) },
+    })
+
+    if (request?.hanhDong === 'support_contact') {
+        return {
+            id: String(request.maLog),
+            name: request.tieuDe ?? '',
+            email: request.danhMuc ?? '',
+            message: request.noiDung ?? '',
+            status: request.daDoc ? 'resolved' : 'pending',
+            created_at: request.thoiGian.toISOString(),
+        }
+    }
+
+    return null
 }

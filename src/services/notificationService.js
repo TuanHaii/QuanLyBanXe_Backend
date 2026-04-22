@@ -1,41 +1,65 @@
-import { notifications, markNotificationRead } from './dataStore.js'
+import prisma from './prismaClient.js'
 
-export const getNotifications = ({ category, is_read } = {}) => {
-    let results = [...notifications]
+const mapNotification = (log) => ({
+    id: String(log.maLog),
+    category: log.danhMuc ?? 'Hệ thống',
+    title: log.tieuDe ?? log.hanhDong,
+    message: log.noiDung ?? '',
+    icon: log.icon ?? 'system',
+    is_read: log.daDoc,
+    created_at: log.thoiGian.toISOString(),
+})
 
-    if (category) {
-        results = results.filter((notification) =>
-            notification.category.toLowerCase() === category.toLowerCase(),
-        )
+export const getNotifications = async ({ maTaiKhoan, category, is_read } = {}) => {
+    const normalizedCategory = category?.trim().toLowerCase()
+    let normalizedIsRead
+    if (Object.hasOwn({ is_read }, 'is_read')) {
+        normalizedIsRead = typeof is_read === 'string'
+            ? is_read.toLowerCase() === 'true'
+            : Boolean(is_read)
     }
 
-    if (is_read !== undefined) {
-        const normalized =
-            typeof is_read === 'string'
-                ? is_read.toLowerCase() === 'true'
-                : Boolean(is_read)
-        results = results.filter((notification) => notification.is_read === normalized)
+    const notifications = await prisma.nhatKyHoatDong.findMany({
+        where: {
+            ...(maTaiKhoan ? { maTaiKhoan } : {}),
+            ...(normalizedCategory ? { danhMuc: { contains: normalizedCategory, mode: 'insensitive' } } : {}),
+            ...(normalizedIsRead === undefined ? {} : { daDoc: normalizedIsRead }),
+        },
+        orderBy: { thoiGian: 'desc' },
+    })
+
+    return notifications.map(mapNotification)
+}
+
+export const getNotificationById = async (id) => {
+    const notification = await prisma.nhatKyHoatDong.findUnique({
+        where: { maLog: Number(id) },
+    })
+
+    return notification ? mapNotification(notification) : null
+}
+
+export const getNotificationCount = async ({ maTaiKhoan, is_read } = {}) => {
+    let normalizedIsRead
+    if (Object.hasOwn({ is_read }, 'is_read')) {
+        normalizedIsRead = typeof is_read === 'string'
+            ? is_read.toLowerCase() === 'true'
+            : Boolean(is_read)
     }
 
-    return results
+    return prisma.nhatKyHoatDong.count({
+        where: {
+            ...(maTaiKhoan ? { maTaiKhoan } : {}),
+            ...(normalizedIsRead === undefined ? {} : { daDoc: normalizedIsRead }),
+        },
+    })
 }
 
-export const getNotificationById = (id) => {
-    return notifications.find((notification) => notification.id === id)
-}
+export const readNotification = async (id) => {
+    const notification = await prisma.nhatKyHoatDong.update({
+        where: { maLog: Number(id) },
+        data: { daDoc: true },
+    })
 
-export const getNotificationCount = ({ is_read } = {}) => {
-    let results = [...notifications]
-    if (is_read !== undefined) {
-        const normalized =
-            typeof is_read === 'string'
-                ? is_read.toLowerCase() === 'true'
-                : Boolean(is_read)
-        results = results.filter((notification) => notification.is_read === normalized)
-    }
-    return results.length
-}
-
-export const readNotification = (id) => {
-    return markNotificationRead(id)
+    return mapNotification(notification)
 }

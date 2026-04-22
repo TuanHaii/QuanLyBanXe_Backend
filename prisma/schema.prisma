@@ -1,0 +1,254 @@
+// =================================================================
+// 1. CẤU HÌNH KẾT NỐI DATABASE
+// =================================================================
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// =================================================================
+// 2. DANH MỤC HÃNG XE & LOẠI XE
+// =================================================================
+model HangXe {
+  maHang  Int     @id @default(autoincrement())
+  tenHang String  @db.VarChar(100)
+  quocGia String? @db.VarChar(100)
+
+  // Quan hệ 1-nhiều
+  danhSachXe Xe[]
+
+  @@map("hang_xe") // Tên bảng dưới Postgres
+}
+
+model LoaiXe {
+  maLoaiXe Int    @id @default(autoincrement())
+  tenLoai  String @db.VarChar(100) // Sedan, SUV, MPV...
+
+  // Quan hệ 1-nhiều
+  danhSachXe Xe[]
+
+  @@map("loai_xe")
+}
+
+// =================================================================
+// 3. THÔNG TIN XE (SẢN PHẨM CHÍNH)
+// =================================================================
+model Xe {
+  maXe       Int     @id @default(autoincrement())
+  tenXe      String  @db.VarChar(255)
+  giaBan     Decimal @db.Decimal(18, 2)
+  namSanXuat Int
+  mauSac     String  @db.VarChar(50)
+  soKhung    String  @db.VarChar(50)
+  soMay      String  @db.VarChar(50)
+  dungTich   String? @db.VarChar(50)
+  soLuongTon Int     @default(0)
+  trangThai  Boolean @default(true)
+
+  // Khóa ngoại
+  maHang Int
+  hangXe HangXe @relation(fields: [maHang], references: [maHang])
+
+  maLoaiXe Int
+  loaiXe   LoaiXe @relation(fields: [maLoaiXe], references: [maLoaiXe])
+
+  // Quan hệ 1-nhiều
+  chiTietHoaDon    ChiTietHoaDon[]
+  chiTietPhieuNhap ChiTietPhieuNhap[]
+
+  @@map("xe")
+}
+
+// =================================================================
+// 4. NHÂN SỰ & TÀI KHOẢN
+// =================================================================
+model ChucVu {
+  maChucVu  Int    @id @default(autoincrement())
+  tenChucVu String @db.VarChar(100)
+
+  danhSachNhanVien NhanVien[]
+
+  @@map("chuc_vu")
+}
+
+model NhanVien {
+  maNhanVien Int     @id @default(autoincrement())
+  hoTen      String  @db.VarChar(255)
+  sdt        String  @db.VarChar(20)
+  email      String? @db.VarChar(100)
+  diaChi     String?
+  avatar     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Khóa ngoại
+  maChucVu Int
+  chucVu   ChucVu @relation(fields: [maChucVu], references: [maChucVu])
+
+  // Quan hệ
+  taiKhoan  TaiKhoan? // 1 Nhân viên - 1 Tài khoản
+  hoaDon    HoaDon[]
+  phieuNhap PhieuNhap[]
+
+  @@map("nhan_vien")
+}
+
+model TaiKhoan {
+  maTaiKhoan  Int     @id @default(autoincrement())
+  tenDangNhap String  @db.VarChar(100)
+  matKhauHash String
+  trangThai   Boolean @default(true) // true = Đang hoạt động
+  preferences Json?
+
+  // Khóa ngoại tới Nhân viên (Quan hệ 1-1 nên dùng @unique)
+  maNhanVien Int      @unique
+  nhanVien   NhanVien @relation(fields: [maNhanVien], references: [maNhanVien])
+
+  @@map("tai_khoan")
+}
+
+// =================================================================
+// 5. KHÁCH HÀNG & KHUYẾN MÃI
+// =================================================================
+model KhachHang {
+  maKhachHang Int     @id @default(autoincrement())
+  hoTen       String  @db.VarChar(255)
+  sdt         String  @db.VarChar(20)
+  email       String? @db.VarChar(100)
+  diaChi      String?
+  diemTichLuy Int     @default(0)
+
+  danhSachHoaDon HoaDon[]
+
+  @@map("khach_hang")
+}
+
+model KhuyenMai {
+  maKhuyenMai   Int      @id @default(autoincrement())
+  tenKhuyenMai  String   @db.VarChar(255)
+  ngayBatDau    DateTime
+  ngayKetThuc   DateTime
+  giaTri        Float    // Phần trăm hoặc số tiền giảm
+  loaiKhuyenMai Int      // 0: Giảm tiền mặt, 1: Giảm %
+
+  danhSachHoaDon HoaDon[]
+
+  @@map("khuyen_mai")
+}
+
+// =================================================================
+// 6. HÓA ĐƠN BÁN XE
+// =================================================================
+model HoaDon {
+  maHoaDon            Int      @id @default(autoincrement())
+  ngayLap             DateTime @default(now())
+  tongTien            Decimal  @db.Decimal(18, 2)
+  phuongThucThanhToan String?  @db.VarChar(50)
+  trangThai           Int      @default(0) // 0: Chờ xử lý, 1: Đã thanh toán, 2: Đã hủy
+
+  // Khóa ngoại
+  maNhanVien Int
+  nhanVien   NhanVien @relation(fields: [maNhanVien], references: [maNhanVien])
+
+  maKhachHang Int
+  khachHang   KhachHang @relation(fields: [maKhachHang], references: [maKhachHang])
+
+  maKhuyenMai Int?
+  khuyenMai   KhuyenMai? @relation(fields: [maKhuyenMai], references: [maKhuyenMai])
+
+  chiTietHoaDon ChiTietHoaDon[]
+
+  @@map("hoa_don")
+}
+
+model ChiTietHoaDon {
+  maChiTietHd Int     @id @default(autoincrement())
+  soLuong     Int
+  donGia      Decimal @db.Decimal(18, 2)
+  thueVat     Float?  @default(10)
+
+  // Khóa ngoại
+  maHoaDon Int
+  hoaDon   HoaDon @relation(fields: [maHoaDon], references: [maHoaDon])
+
+  maXe Int
+  xe   Xe @relation(fields: [maXe], references: [maXe])
+
+  @@map("chi_tiet_hoa_don")
+}
+
+// =================================================================
+// 7. NHẬP KHO & NHÀ CUNG CẤP
+// =================================================================
+model NhaCungCap {
+  maNcc  Int     @id @default(autoincrement())
+  tenNcc String  @db.VarChar(255)
+  sdt    String? @db.VarChar(20)
+  diaChi String?
+
+  danhSachPhieuNhap PhieuNhap[]
+
+  @@map("nha_cung_cap")
+}
+
+model PhieuNhap {
+  maPhieuNhap Int      @id @default(autoincrement())
+  ngayNhap    DateTime @default(now())
+  tongTien    Decimal  @db.Decimal(18, 2)
+  ghiChu      String?
+
+  // Khóa ngoại
+  maNhanVien Int
+  nhanVien   NhanVien @relation(fields: [maNhanVien], references: [maNhanVien])
+
+  maNcc      Int
+  nhaCungCap NhaCungCap @relation(fields: [maNcc], references: [maNcc])
+
+  chiTietPhieuNhap ChiTietPhieuNhap[]
+
+  @@map("phieu_nhap")
+}
+
+model ChiTietPhieuNhap {
+  maChiTietPn Int     @id @default(autoincrement())
+  soLuong     Int
+  donGiaNhap  Decimal @db.Decimal(18, 2)
+
+  // Khóa ngoại
+  maPhieuNhap Int
+  phieuNhap   PhieuNhap @relation(fields: [maPhieuNhap], references: [maPhieuNhap])
+
+  maXe Int
+  xe   Xe @relation(fields: [maXe], references: [maXe])
+
+  @@map("chi_tiet_phieu_nhap")
+}
+
+// =================================================================
+// 8. NHẬT KÝ & BÁO CÁO
+// =================================================================
+model NhatKyHoatDong {
+  maLog      Int      @id @default(autoincrement())
+  maTaiKhoan Int      // Thay vì MaUser
+  hanhDong   String
+  thoiGian   DateTime @default(now())
+  tieuDe     String?
+  noiDung    String?
+  danhMuc    String?
+  icon       String?
+  daDoc      Boolean  @default(false)
+
+  @@map("nhat_ky_hoat_dong")
+}
+
+model BaoCaoDoanhThu {
+  maBaoCao       Int      @id @default(autoincrement())
+  ngayBaoCao     DateTime
+  tongDoanhThu   Decimal  @db.Decimal(18, 2)
+  soLuongDonHang Int
+
+  @@map("bao_cao_doanh_thu")
+}

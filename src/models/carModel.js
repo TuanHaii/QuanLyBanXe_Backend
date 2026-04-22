@@ -1,18 +1,41 @@
+const normalizeDecimal = (value) => (value === null || value === undefined ? 0 : Number(value))
+
+const normalizeBoolean = (value) => {
+    if (typeof value === 'boolean') {
+        return value
+    }
+
+    if (typeof value === 'string') {
+        if (value === 'true') return true
+        if (value === 'false') return false
+        if (value === 'available') return true
+        if (value === 'sold') return false
+        if (value === 'reserved') return true
+    }
+
+    if (typeof value === 'number') {
+        return value !== 0
+    }
+
+    return true
+}
+
 export const mapCar = (row) => ({
-    id: row.id,
-    brand: row.brand,
-    model: row.model,
-    category: row.category,
-    year: row.year,
-    price: row.price !== null ? Number(row.price) : null,
-    status: row.status,
-    stock: row.stock !== null ? Number(row.stock) : 0,
-    rating: row.rating !== null ? Number(row.rating) : 0,
-    imageUrl: row.image_url,
-    badgeLabel: row.badge_label,
-    badgeColor: row.badge_color,
-    description: row.description,
-    createdBy: row.created_by,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
+    maXe: row.maXe ?? row.id,
+    id: row.id ?? String(row.maXe ?? ''),
+    tenXe: row.tenXe ?? row.name ?? '',
+    giaBan: normalizeDecimal(row.giaBan ?? row.price),
+    namSanXuat: row.namSanXuat ?? row.year ?? 0,
+    mauSac: row.mauSac ?? row.color ?? '',
+    soKhung: row.soKhung ?? '',
+    soMay: row.soMay ?? '',
+    dungTich: row.dungTich ?? null,
+    soLuongTon: row.soLuongTon ?? row.stock ?? 0,
+    trangThai: normalizeBoolean(row.trangThai ?? row.status),
+    maHang: row.maHang ?? 0,
+    maLoaiXe: row.maLoaiXe ?? 0,
+    HangXe: row.HangXe ?? row.hangXe ?? null,
+    LoaiXe: row.LoaiXe ?? row.loaiXe ?? null,
+    createdAt: row.createdAt ?? row.created_at ?? null,
+    updatedAt: row.updatedAt ?? row.updated_at ?? null,
 })

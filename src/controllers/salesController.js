@@ -1,23 +1,23 @@
 import { getSaleById, getSales } from '../services/salesService.js'
 import { errorResponse, successResponse } from '../utils/apiResponse.js'
 
-export const listSales = (req, res, next) => {
+export const listSales = async (req, res, next) => {
     try {
         const filters = {
             status: req.query.status,
             query: req.query.query,
         }
-        const data = getSales(filters)
+        const data = await getSales(filters)
         return successResponse(res, data, 'Danh sách sales')
     } catch (error) {
         next(error)
     }
 }
 
-export const getSaleDetail = (req, res, next) => {
+export const getSaleDetail = async (req, res, next) => {
     try {
         const saleId = req.params.id
-        const sale = getSaleById(saleId)
+        const sale = await getSaleById(saleId)
         if (!sale) {
             return errorResponse(res, 404, 'Sale không tồn tại')
         }

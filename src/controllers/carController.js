@@ -7,17 +7,17 @@ import {
 } from '../services/carService.js'
 import { errorResponse, successResponse } from '../utils/apiResponse.js'
 
-export const listCars = (req, res, next) => {
+export const listCars = async (req, res, next) => {
     try {
-        return successResponse(res, getCars(), 'Danh sách xe')
+        return successResponse(res, await getCars(), 'Danh sách xe')
     } catch (error) {
         next(error)
     }
 }
 
-export const getCarDetail = (req, res, next) => {
+export const getCarDetail = async (req, res, next) => {
     try {
-        const car = getCarById(req.params.id)
+        const car = await getCarById(req.params.id)
         if (!car) {
             return errorResponse(res, 404, 'Xe không tồn tại')
         }
@@ -27,18 +27,18 @@ export const getCarDetail = (req, res, next) => {
     }
 }
 
-export const createCarController = (req, res, next) => {
+export const createCarController = async (req, res, next) => {
     try {
-        const car = createCar(req.body)
+        const car = await createCar(req.body)
         return successResponse(res, car, 'Xe đã được thêm')
     } catch (error) {
         next(error)
     }
 }
 
-export const updateCarController = (req, res, next) => {
+export const updateCarController = async (req, res, next) => {
     try {
-        const updatedCar = updateCar(req.params.id, req.body)
+        const updatedCar = await updateCar(req.params.id, req.body)
         if (!updatedCar) {
             return errorResponse(res, 404, 'Xe không tồn tại')
         }
@@ -48,9 +48,9 @@ export const updateCarController = (req, res, next) => {
     }
 }
 
-export const deleteCarController = (req, res, next) => {
+export const deleteCarController = async (req, res, next) => {
     try {
-        const deleted = deleteCar(req.params.id)
+        const deleted = await deleteCar(req.params.id)
         if (!deleted) {
             return errorResponse(res, 404, 'Xe không tồn tại')
         }
